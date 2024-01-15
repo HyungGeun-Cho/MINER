@@ -126,6 +126,7 @@ def miner_imfit(im, nscales, switch_mse, stopping_mse, config):
     
     # Begin
     for scale_idx in tqdm.tqdm(range(nscales), dynamic_ncols=True):
+        torch.cuda.empty_cache()
         imtarget_ten = torch.nn.functional.interpolate(imten[None, ...],
                                     scale_factor=pow(2.0, -nscales+scale_idx+1),
                                     mode='area')
@@ -199,7 +200,8 @@ def miner_imfit(im, nscales, switch_mse, stopping_mse, config):
         master_indices = master_indices.cuda(non_blocking=True)
         signal_norm = signal_norm.cuda(non_blocking=True)
         
-        for idx in tbar:             
+        for idx in tbar:
+            torch.cuda.empty_cache()             
             if learn_indices.numel() == 0:
                 break
             lr = config.lr*learn_indices.numel()/master_indices.numel()

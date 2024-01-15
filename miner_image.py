@@ -21,13 +21,15 @@ sys.path.append('modules')
 import utils
 import miner
 
+# import json
+
 import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
-    expname = 'pluto'                       # Image name (jpg)
-    configname = 'configs/image_32x32.ini'  # Configuration file
-    scale = 0.25             # Set scale to 0.5 for faster results
+    expname = 'pearl'                       # Image name (jpg)
+    configname = 'configs/image_32x32_giga.ini'  # Configuration file
+    scale = 1             # Set scale to 0.5 for faster results
     stopping_mse = 1e-4     # When to stop image fitting
     target_mse = 1e-4   # Per-block stopping criterion
     nscales = 4                 # Number of MINER scales
@@ -45,7 +47,7 @@ if __name__ == '__main__':
     im = utils.moduloclip(im, clip_size)
     H, W, _ = im.shape
     
-    config.savedir = '../results/%s_%d'%(expname, H)
+    config.savedir = './results_image/%s_%d'%(expname, H)
     os.makedirs(config.savedir, exist_ok=True)
     
     # Now run MINER
@@ -73,11 +75,18 @@ if __name__ == '__main__':
     mse_array = info['mse_array']
     
     os.makedirs('results', exist_ok=True)
-    mdict = {'mse_array': mse_array,
+    mdict = {'total_time(s)': total_time, 
+             'psnr': utils.psnr(im, best_im), 
+             'ssim': ssim_func(im, best_im, multichannel=True), 
+             'total_parameters': nparams,
+             'mse_array': mse_array,
              'time_array': time_array,
              'nparams': nparams,
              'memory_array': info['memory_array'],
              'nparams_array': info['nparams_array']}
+
+    # with open('results/%s_miner.json'%expname, "w") as outfile: 
+    #     json.dump(mdict, outfile)
     
     io.savemat('results/%s_miner.mat'%expname, mdict)
     

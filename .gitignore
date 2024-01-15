@@ -7,6 +7,7 @@ modules/__pycache__
 # Do not track results
 results/
 data/
+results_image/
 
 # C extensions
 *.so
